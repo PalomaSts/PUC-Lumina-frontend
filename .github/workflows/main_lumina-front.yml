@@ -1,41 +1,60 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
-
 name: Build and deploy Node.js app to Azure Web App - lumina-front
 
 on:
   push:
     branches:
-      - master
+      - main
   workflow_dispatch:
+
+env:
+  NODE_OPTIONS: "--max_old_space_size=4096"
 
 jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: read #This is required for actions/checkout
+      contents: read
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repo
+        uses: actions/checkout@v4
 
-      - name: Set up Node.js version
+      - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: "24.x"
 
-      - name: npm install, build, and test
-        run: |
-          npm install --force
-          npm run build --if-present
+      - name: Use npm cache (speedup)
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
 
-      - name: Prepare publish folder (dist + production deps)
+      - name: Install deps
+        run: npm install --force
+
+      - name: Build (inject REACT_APP_SERVER_URL from secret)
+        env:
+          REACT_APP_SERVER_URL: ${{ secrets.REACT_APP_SERVER_URL }}
+        run: npm run build --if-present
+
+      - name: Prepare publish folder (copy build contents to publish root)
         run: |
           rm -rf publish
           mkdir -p publish
-          cp package*.json publish/
-          cp -R build publish/
-          # install only production deps into publish
-          npm ci --only=production --prefix publish
+          cp package*.json publish/ 2>/dev/null || true
+          if [ -d build ]; then
+            # copy the contents of build/ into publish/ root (important)
+            cp -R build/* publish/
+          else
+            echo "No build folder found — ensure `npm run build` created it"
+            ls -la
+            exit 1
+          fi
+          # optionally install production deps into publish (safe no-op for CRA)
+          npm ci --only=production --prefix publish || true
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
@@ -47,8 +66,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     permissions:
-      id-token: write #This is required for requesting the JWT
-      contents: read #This is required for actions/checkout
+      id-token: write
+      contents: read
 
     steps:
       - name: Download artifact from build job
@@ -63,5 +82,5 @@ jobs:
         with:
           app-name: "lumina-front"
           slot-name: "Production"
-          package: .
+          package: publish
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
