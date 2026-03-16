@@ -1,5 +1,7 @@
-import { createContext, PropsWithChildren, useContext, useState } from "react";
+import { createContext, PropsWithChildren, useContext, useEffect, useState } from "react";
 import { User } from "../schemas/User";
+
+const API = process.env.REACT_APP_SERVER_URL;
 
 type AuthContextProps = {
   user?: User;
@@ -9,28 +11,34 @@ type AuthContextProps = {
   getSignedInUser: () => User | undefined;
 };
 
-function getSignedInUser() {
-  const storage = localStorage.getItem("logged-in");
-  return storage ? (JSON.parse(localStorage.getItem("logged-in") || "{}") as User) : undefined;
-}
-
 export const AuthContext = createContext<AuthContextProps>({
-  getSignedInUser,
+  getSignedInUser: () => undefined,
   signInUser: () => {},
   signOutUser: () => {},
   isUserSignedIn: false,
 });
 
 export function AuthProvider({ children }: PropsWithChildren) {
-  const [user, setUser] = useState<User | undefined>(getSignedInUser());
+  const [user, setUser] = useState<User | undefined>();
+
+  useEffect(() => {
+  fetch(`${API}/auth/me`, {
+    credentials: "include",
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      if (data) {
+        setUser(data);
+        localStorage.setItem("logged-in", JSON.stringify(data));
+      }
+    })
+    .catch(() => {});
+  }, []);
 
   const contextProps: AuthContextProps = {
     user,
     isUserSignedIn: Boolean(user),
-    getSignedInUser: () => {
-      const storage = localStorage.getItem("logged-in");
-      return storage ? (JSON.parse(localStorage.getItem("logged-in") || "{}") as User) : undefined;
-    },
+    getSignedInUser: () => user,
     signInUser: (user) => {
       localStorage.setItem("logged-in", JSON.stringify(user));
       setUser(user);
