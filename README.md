@@ -77,7 +77,7 @@ Arquivo:
 
 ```
 .github/workflows/ci_lumina-front.yml
-.github/workflows/main_lumina-front.yml
+.github/workflows/cd_lumina-front.yml
 ```
 
 ---
