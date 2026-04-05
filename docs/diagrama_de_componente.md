@@ -16,7 +16,7 @@ System_Boundary(backend, "Backend [Component]") {
 }
 
 Container(oauth, "OAuth", "Container: Google")
-ContainerDb(database, "Database", "Container: AWS postgresql", "Cloud")
+ContainerDb(database, "Database", "Container: Railway postgresql", "Cloud")
 
 Rel(usuario, frontend, "")
 Rel(frontend, main, "")

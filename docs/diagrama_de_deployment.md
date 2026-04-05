@@ -12,23 +12,25 @@ Deployment_Node(oauth_node, "Serviço Externo de Autenticação", "Deployment No
     Container(oauth, "OAuth", "Container: Google", "Serviço de autenticação")
 }
 
-Deployment_Node(aws_cloud, "Deployment AWS Cloud", "") {
-
-    Deployment_Node(lumina_web, "lumina-web", "Deployment Node: Amplify Hosting") {
+Deployment_Node(vercel_cloud, "Deployment Vercel", "") {
+    Deployment_Node(lumina_web, "lumina-web", "Deployment Node: Vercel") {
         Deployment_Node(react_node, "React", "Deployment Node: React 18.3.1") {
             Container(frontend, "Frontend", "Container: React", "Tela de acesso")
         }
     }
+}
 
-    Deployment_Node(lumina_api, "lumina-api", "Deployment Node: ECS") {
+Deployment_Node(railway_cloud, "Deployment Railway", "") {
+
+    Deployment_Node(lumina_api, "lumina-api", "Deployment Node: Railway") {
         Deployment_Node(nest_node, "Nest", "Deployment Node: Nest 10.0.0") {
             Container(backend, "Backend", "Container: TypeScript", "Validação do acesso")
         }
     }
 
-    Deployment_Node(lumina_db, "lumina-db01", "Deployment Node: Cloud Server") {
-        Deployment_Node(aurora_node, "Aurora", "Deployment Node: AWS") {
-            Container(database, "Database", "Container: AWS", "")
+    Deployment_Node(lumina_db, "lumina-db01", "Deployment Node: Railway Postgres") {
+        Deployment_Node(postgres_node, "Postgres", "Deployment Node: Railway Postgres") {
+            Container(database, "Database", "Container: Railway Postgres", "")
         }
     }
 }
