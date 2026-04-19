@@ -32,7 +32,7 @@ const btnStyles: SxProps = {
 };
 
 const TopBtn = ({ children }: PropsWithChildren) => (
-  <Paper elevation={6} sx={{btnStyles, height: 320,}}>
+  <Paper elevation={6} sx={{...btnStyles, height: 320,}}>
     <Stack spacing={2} p={3} height="100%" alignItems="center" justifyContent="center">
       {children}
     </Stack>
@@ -128,7 +128,7 @@ export function Home() {
         {/* CARD 1 */}
         <Grid size={6}>
           <TopBtn>
-              <Stack spacing={2} height="100%">
+              <Stack spacing={2} height="100%" width="100%">
                 <Typography variant="h6">Weekly Activity</Typography>
                 {loadingWeekly ? (
                   <Typography fontSize={12}>Carregando...</Typography>
@@ -137,7 +137,7 @@ export function Home() {
                     Nenhuma tarefa concluída esta semana
                   </Typography>
                 ) : (
-                  <Box width="100%" flex={1}>
+                  <Box width="100%" height="100%" flex={1}>
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart data={weeklyData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
                         <CartesianGrid strokeDasharray="3 3" stroke="#333" />
@@ -175,49 +175,52 @@ export function Home() {
         <Grid size={6}>
           <TopBtn>
             {/* gráfico circular */}
-            <Box position="relative" display="inline-flex">
-              <CircularProgress
-                variant="determinate"
-                value={percentage}
-                size={90}
-                color={getColor()}
-              />
-              <Box
-                position="absolute"
-                top={0}
-                left={0}
-                bottom={0}
-                right={0}
-                display="flex"
-                alignItems="center"
-                justifyContent="center"
-              >
-                <Typography variant="h6" fontWeight={600}>
-                  {percentage}%
-                </Typography>
+            <Stack spacing={2} alignItems="center" justifyContent="center">
+              <Box position="relative" display="inline-flex">
+                <CircularProgress
+                  variant="determinate"
+                  value={percentage}
+                  size={90}
+                  color={getColor()}
+                />
+                <Box
+                  position="absolute"
+                  top={0}
+                  left={0}
+                  bottom={0}
+                  right={0}
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="center"
+                >
+                  <Typography variant="h6" fontWeight={600}>
+                    {percentage}%
+                  </Typography>
+                </Box>
               </Box>
-            </Box>
-
-            <Typography variant="h6" sx={{ mt: 1 }}>
-              Progress
-            </Typography>
-
-            <Typography variant="body2">
-              {completedStats.completed} / {completedStats.total} completed
-            </Typography>
-
-            {/* barra complementar */}
-            <Box sx={{ width: "80%", mt: 2 }}>
-              <LinearProgress
-                variant="determinate"
-                value={percentage}
-                color={getColor()}
-                sx={{
-                  height: 10,
-                  borderRadius: 5,
-                }}
-              />
-            </Box>
+  
+              <Typography variant="h6" sx={{ mt: 1 }}>
+                Progress
+              </Typography>
+  
+              <Typography variant="body2">
+                {completedStats.completed} / {completedStats.total} completed
+              </Typography>
+  
+              {/* barra complementar */}
+              <Box sx={{ width: "80%", mt: 2 }}>
+                <LinearProgress
+                  variant="determinate"
+                  value={percentage}
+                  color={getColor()}
+                  sx={{
+                    height: 10,
+                    borderRadius: 5,
+                  }}
+                />
+              </Box>
+            </Stack>
+            
           </TopBtn>
         </Grid>
       </Grid>
