@@ -1,5 +1,4 @@
 import {
-  BarChart,
   PieChart,
   Person as ProfileIcon,
   BackupTable as ProjectsIcon,
@@ -17,6 +16,13 @@ import {
 } from "@mui/material";
 import { PropsWithChildren, useEffect, useState } from "react";
 import { useNavigator } from "../AppRouter";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 
 const btnStyles: SxProps = {
   display: "flex",
@@ -52,23 +58,16 @@ const BottomBtn = ({ children, ...props }: PropsWithChildren & any) => (
 export function Home() {
   const navigator = useNavigator();
 
-  const [last24h, setLast24h] = useState<number>(0);
   const [completedStats, setCompletedStats] = useState({
     total: 0,
     completed: 0,
   });
+  const [weeklyData, setWeeklyData] = useState<any[]>([]);
+  const [loadingWeekly, setLoadingWeekly] = useState(true);
 
   useEffect(() => {
     (async () => {
       try {
-        const res1 = await fetch(
-          `${process.env.REACT_APP_SERVER_URL}/tasks/stats/last24h`,
-          { credentials: "include" }
-        );
-        if (res1.ok) {
-          const data = await res1.json();
-          setLast24h(data.count || 0);
-        }
 
         const res2 = await fetch(
           `${process.env.REACT_APP_SERVER_URL}/tasks/stats/completion`,
@@ -77,6 +76,25 @@ export function Home() {
         if (res2.ok) {
           const data = await res2.json();
           setCompletedStats(data);
+        }
+
+        const res3 = await fetch(
+          `${process.env.REACT_APP_SERVER_URL}/tasks/stats/weekly`,
+          { credentials: "include" }
+        );
+    
+        if (res3.ok) {
+          const data = await res3.json();
+    
+          const formatted = data.map((d: any) => ({
+            name: new Date(d.date).toLocaleDateString("pt-BR", {
+              weekday: "short",
+            }),
+            tasks: d.count,
+          }));
+    
+          setWeeklyData(formatted);
+          setLoadingWeekly(false);
         }
       } catch (err) {
         console.error("Error fetching stats", err);
@@ -102,17 +120,22 @@ export function Home() {
         {/* CARD 1 */}
         <Grid size={6}>
           <TopBtn>
-            <BarChart sx={{ fontSize: 70 }} />
-
-            <Typography variant="h6">Today</Typography>
-
-            <Typography variant="h4" fontWeight={600}>
-              {last24h}
-            </Typography>
-
-            <Typography variant="body2" sx={{ opacity: 0.7 }}>
-              tasks completed in the last 24h
-            </Typography>
+              <Stack spacing={2} p={4}>
+                <Typography variant="h6">Weekly Activity</Typography>
+                {!loadingWeekly && weeklyData.every(d => d.tasks === 0) ? (
+                  <Typography fontSize={12}>Nenhuma tarefa concluída esta semana</Typography>
+                ) : (
+                  <Box width="100%">
+                    <ResponsiveContainer width="100%" height={200}>
+                      <BarChart data={weeklyData}>
+                        <XAxis dataKey="name" />
+                        <Tooltip formatter={(value: number) => `${value} tarefas`} />
+                        <Bar dataKey="tasks" radius={[4, 4, 0, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>  
+                  </Box>
+                )}
+              </Stack>
           </TopBtn>
         </Grid>
 
