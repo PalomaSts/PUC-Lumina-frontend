@@ -27,7 +27,7 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import { createContext, PropsWithChildren, useContext, useState } from "react";
+import { createContext, MouseEvent, PropsWithChildren, useContext, useState } from "react";
 import { RouterPaths, useNavigator, useRouteMatch } from "../AppRouter";
 import { useAuthContext } from "./AuthContext";
 
@@ -127,7 +127,7 @@ export function AppProvider({ children }: PropsWithChildren) {
                 <>
                   <Button
                     variant="outlined"
-                    onClick={(ev) => {
+                    onClick={(ev: MouseEvent<HTMLButtonElement>) => {
                       setAnchorRoutesEl(ev.currentTarget);
                     }}
                   >
@@ -169,7 +169,7 @@ export function AppProvider({ children }: PropsWithChildren) {
                   <Paper sx={{ borderRadius: "50%" }} elevation={4}>
                     <Button
                       sx={{ height: 64, width: 64 }}
-                      onClick={(ev) => {
+                      onClick={(ev: MouseEvent<HTMLButtonElement>) => {
                         setAnchorAvatarEl(ev.currentTarget);
                       }}
                     >

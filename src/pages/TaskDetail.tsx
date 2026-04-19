@@ -10,6 +10,8 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  Typography,
+  Paper,
 } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
@@ -41,6 +43,8 @@ export function TaskDetail() {
   const state = location.state;
   const [projects, setProjects] = useState<any[]>([]);
   const [showCancelDialog, setShowCancelDialog] = useState(false);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [loadingAI, setLoadingAI] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -95,6 +99,8 @@ export function TaskDetail() {
     },
   });
 
+  const selectedProject = projects.find(p => p.id === form.values.projectId);
+
   const getNextStatusOptions = (current: string) => {
     switch (current) {
       case 'new':
@@ -127,6 +133,33 @@ export function TaskDetail() {
     }
   };
 
+  useEffect(() => {
+    setSuggestions([]);
+  }, [form.values.projectId]);
+
+  const getSuggestions = async () => {
+    if (!selectedProject) return;
+
+    setLoadingAI(true);
+
+    try {
+      const res = await fetch(
+        `${process.env.REACT_APP_SERVER_URL}/ai/suggest-tasks?project=${selectedProject.name}`
+      );
+
+      if (!res.ok) {
+        throw new Error("Erro ao gerar sugestões");
+      }
+
+      const data = await res.json();
+      setSuggestions(data.suggestions || []);
+    } catch (err) {
+      console.error(err);
+    }
+
+    setLoadingAI(false);
+  };
+
   return (
     <>
       <Modal
@@ -137,6 +170,54 @@ export function TaskDetail() {
       >
         <Box sx={style}>
           <Stack spacing={4}>
+            <Select
+              value={form.values.projectId || ''}
+              onChange={(e) => form.setFieldValue('projectId', e.target.value)}
+              fullWidth
+              disabled={state?.readonly}
+              displayEmpty
+            >
+              <MenuItem value="">Select a project</MenuItem>
+              {projects.map((project) => (
+                <MenuItem key={project.id} value={project.id}>
+                  {project.name}
+                </MenuItem>
+              ))}
+            </Select>
+
+            <Button
+              variant="outlined"
+              onClick={getSuggestions}
+              disabled={!form.values.projectId || loadingAI}
+              sx={{ mt: 1 }}
+            >
+             {loadingAI ? "Gerando..." : "💡 Sugerir tarefas com IA"}
+            </Button>
+
+            {suggestions.length > 0 && (
+              <Stack spacing={1} mt={2}>
+                <Typography variant="subtitle1">Sugestões:</Typography>
+            
+                {suggestions.map((s, index) => (
+                  <Paper key={index} sx={{ p: 1.5 }}>
+                    <Stack direction="row" justifyContent="space-between">
+                      <Typography fontSize={14}>{s}</Typography>
+            
+                      <Button
+                        size="small"
+                        onClick={() => {
+                          form.setFieldValue("title", s);
+                          setSuggestions([]);
+                        }}
+                      >
+                        Usar
+                      </Button>
+                    </Stack>
+                  </Paper>
+                ))}
+              </Stack>
+            )}
+
             <FormInputControl
               schema={taskSchema}
               form={form}
@@ -184,20 +265,6 @@ export function TaskDetail() {
                 variant="outlined"
               />
             )}
-            <Select
-              value={form.values.projectId || ''}
-              onChange={(e) => form.setFieldValue('projectId', e.target.value)}
-              fullWidth
-              disabled={state?.readonly}
-              displayEmpty
-            >
-              <MenuItem value="">No Project</MenuItem>
-              {projects.map((project) => (
-                <MenuItem key={project.id} value={project.id}>
-                  {project.name}
-                </MenuItem>
-              ))}
-            </Select>
 
             <TextField
               type="date"
