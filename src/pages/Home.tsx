@@ -32,8 +32,8 @@ const btnStyles: SxProps = {
 };
 
 const TopBtn = ({ children }: PropsWithChildren) => (
-  <Paper elevation={6} sx={{...btnStyles, height: 320,}}>
-    <Stack spacing={2} p={3} height="100%" alignItems="center" justifyContent="center">
+  <Paper elevation={6} sx={{...btnStyles, height: 320, width: "100%",}}>
+    <Stack spacing={2} p={3} height="100%" alignItems="stretch" justifyContent="center">
       {children}
     </Stack>
   </Paper>
@@ -138,7 +138,7 @@ export function Home() {
       {/* ===== TOP CARDS ===== */}
       <Grid container spacing={5}>
         {/* CARD 1 */}
-        <Grid size={6}>
+        <Grid size={6} sx={{ display: "flex" }}>
           <TopBtn>
               <Stack spacing={2} height="100%" width="100%" alignItems="stretch">
                 <Typography variant="h6">Weekly Activity</Typography>
@@ -149,7 +149,7 @@ export function Home() {
                     Nenhuma tarefa concluída esta semana
                   </Typography>
                 ) : (
-                  <Box width="100%" height="100%" flex={1} display="flex">
+                  <Box width="100%" height="100%" flex={1} display="flex" minWidth={0}>
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart data={weeklyData} margin={{ top: 10, right: 0, left: 0, bottom: 0 }} >
                         <CartesianGrid strokeDasharray="3 3" stroke="#333" />
