@@ -149,7 +149,7 @@ export function Home() {
                     Nenhuma tarefa concluída esta semana
                   </Typography>
                 ) : (
-                  <Box flex={1} minHeight={0}>
+                  <Box sx={{ flex: 1, minHeight: 200, display: "flex" }}>
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart data={weeklyData} margin={{ top: 10, right: 0, left: 0, bottom: 0 }} >
                         <CartesianGrid strokeDasharray="3 3" stroke="#333" />
