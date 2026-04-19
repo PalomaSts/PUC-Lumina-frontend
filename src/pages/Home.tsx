@@ -22,6 +22,7 @@ import {
   XAxis,
   Tooltip,
   ResponsiveContainer,
+  CartesianGrid,
 } from "recharts";
 
 const btnStyles: SxProps = {
@@ -62,7 +63,12 @@ export function Home() {
     total: 0,
     completed: 0,
   });
-  const [weeklyData, setWeeklyData] = useState<any[]>([]);
+  type WeeklyData = {
+    name: string;
+    tasks: number;
+  };
+  
+  const [weeklyData, setWeeklyData] = useState<WeeklyData[]>([]);
   const [loadingWeekly, setLoadingWeekly] = useState(true);
 
   useEffect(() => {
@@ -86,11 +92,11 @@ export function Home() {
         if (res3.ok) {
           const data = await res3.json();
     
-          const formatted = data.map((d: any) => ({
+          const formatted = data.map((d: any, index: number, arr: any[]) => ({
             name: new Date(d.date).toLocaleDateString("pt-BR", {
               weekday: "short",
             }),
-            tasks: d.count,
+            tasks: d.count
           }));
     
           setWeeklyData(formatted);
@@ -98,6 +104,8 @@ export function Home() {
         }
       } catch (err) {
         console.error("Error fetching stats", err);
+      } finally {
+        setLoadingWeekly(false);
       }
     })();
   }, []);
@@ -120,17 +128,41 @@ export function Home() {
         {/* CARD 1 */}
         <Grid size={6}>
           <TopBtn>
-              <Stack spacing={2} p={4}>
+              <Stack spacing={2}>
                 <Typography variant="h6">Weekly Activity</Typography>
-                {!loadingWeekly && weeklyData.every(d => d.tasks === 0) ? (
-                  <Typography fontSize={12}>Nenhuma tarefa concluída esta semana</Typography>
+                {loadingWeekly ? (
+                  <Typography fontSize={12}>Carregando...</Typography>
+                ) : weeklyData.every(d => d.tasks === 0) ? (
+                  <Typography fontSize={12}>
+                    Nenhuma tarefa concluída esta semana
+                  </Typography>
                 ) : (
                   <Box width="100%">
-                    <ResponsiveContainer width="100%" height={200}>
-                      <BarChart data={weeklyData}>
-                        <XAxis dataKey="name" />
+                    <ResponsiveContainer width="100%" height={250}>
+                      <BarChart data={weeklyData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#333" />
+                        <XAxis dataKey="name" stroke="#aaa" tick={{ fontSize: 12 }} />
                         <Tooltip formatter={(value) => `${value ?? 0} tarefas`} />
-                        <Bar dataKey="tasks" radius={[4, 4, 0, 0]} />
+                        <Bar
+                          dataKey="tasks"
+                          barSize={30}
+                          radius={[8, 8, 0, 0]}
+                          shape={(props: any) => {
+                            const { x, y, width, height, index } = props;
+                            const isToday = index === weeklyData.length - 1;
+                        
+                            return (
+                              <rect
+                                x={x}
+                                y={y}
+                                width={width}
+                                height={height}
+                                fill={isToday ? "#fbbf24" : "#f59e0b"}
+                                rx={6}
+                              />
+                            );
+                          }}
+                        />
                       </BarChart>
                     </ResponsiveContainer>  
                   </Box>
