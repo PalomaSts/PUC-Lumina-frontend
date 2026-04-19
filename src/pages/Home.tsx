@@ -92,12 +92,24 @@ export function Home() {
         if (res3.ok) {
           const data = await res3.json();
     
-          const formatted = data.map((d: any, index: number, arr: any[]) => ({
-            name: new Date(d.date).toLocaleDateString("pt-BR", {
-              weekday: "short",
-            }),
-            tasks: d.count
-          }));
+          const last7Days = Array.from({ length: 7 }).map((_, i) => {
+            const date = new Date();
+            date.setDate(date.getDate() - (6 - i));
+            date.setHours(0, 0, 0, 0);
+            return date;
+          });
+          
+          const formatted = last7Days.map((day) => {
+            const found = data.find((d: any) => {
+              const dDate = new Date(d.date);
+              return dDate.toDateString() === day.toDateString();
+            });
+          
+            return {
+              name: day.toLocaleDateString("pt-BR", { weekday: "short" }),
+              tasks: found ? found.count : 0,
+            };
+          });
     
           setWeeklyData(formatted);
           setLoadingWeekly(false);
@@ -139,13 +151,13 @@ export function Home() {
                 ) : (
                   <Box width="100%" height="100%" flex={1} display="flex">
                     <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={weeklyData} margin={{ top: 10, right: 0, left: 0, bottom: 0 }} barCategoryGap="20%">
+                      <BarChart data={weeklyData} margin={{ top: 10, right: 0, left: 0, bottom: 0 }} >
                         <CartesianGrid strokeDasharray="3 3" stroke="#333" />
                         <XAxis dataKey="name" stroke="#aaa" tick={{ fontSize: 12 }} axisLine={false} tickLine={false} />
                         <Tooltip formatter={(value) => `${value ?? 0} tarefas`} />
                         <Bar
                           dataKey="tasks"
-                          barSize={30}
+                          barSize={40}
                           radius={[8, 8, 0, 0]}
                           shape={(props: any) => {
                             const { x, y, width, height, index } = props;
