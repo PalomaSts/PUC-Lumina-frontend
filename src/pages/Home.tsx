@@ -129,7 +129,7 @@ export function Home() {
                     <ResponsiveContainer width="100%" height={200}>
                       <BarChart data={weeklyData}>
                         <XAxis dataKey="name" />
-                        <Tooltip formatter={(value: number) => `${value} tarefas`} />
+                        <Tooltip formatter={(value) => `${value ?? 0} tarefas`} />
                         <Bar dataKey="tasks" radius={[4, 4, 0, 0]} />
                       </BarChart>
                     </ResponsiveContainer>  
