@@ -151,9 +151,9 @@ export function Home() {
                 ) : (
                   <Box sx={{ flex: 1, minHeight: 200}}>
                     <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={weeklyData} margin={{ top: 10, right: 0, left: 0, bottom: 0 }} >
+                      <BarChart data={weeklyData} margin={{ top: 10, right: 0, left: 0, bottom: 30 }} >
                         <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-                        <XAxis dataKey="name" stroke="#aaa" tick={{ fontSize: 12 }} axisLine={false} tickLine={false} />
+                        <XAxis dataKey="name" stroke="#aaa" tick={{ fontSize: 12 }} axisLine={false} tickLine={false} height={30}/>
                         <Tooltip formatter={(value) => `${value ?? 0} tarefas`} />
                         <Bar
                           dataKey="tasks"
