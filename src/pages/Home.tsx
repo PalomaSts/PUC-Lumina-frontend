@@ -32,8 +32,8 @@ const btnStyles: SxProps = {
 };
 
 const TopBtn = ({ children }: PropsWithChildren) => (
-  <Paper elevation={6} sx={{...btnStyles, height: 320, width: "100%",}}>
-    <Stack spacing={2} p={3} height="100%" alignItems="stretch" justifyContent="flex-start">
+  <Paper elevation={6} sx={{ height: 320, width: "100%" }}>
+    <Stack spacing={2} p={3} height="100%">
       {children}
     </Stack>
   </Paper>
@@ -149,7 +149,7 @@ export function Home() {
                     Nenhuma tarefa concluída esta semana
                   </Typography>
                 ) : (
-                  <Box sx={{ flex: 1, minHeight: 200, display: "flex" }}>
+                  <Box sx={{ flex: 1, minHeight: 200}}>
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart data={weeklyData} margin={{ top: 10, right: 0, left: 0, bottom: 0 }} >
                         <CartesianGrid strokeDasharray="3 3" stroke="#333" />
