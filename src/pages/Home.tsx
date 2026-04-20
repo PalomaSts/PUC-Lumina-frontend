@@ -100,9 +100,16 @@ export function Home() {
           });
           
           const formatted = last7Days.map((day) => {
+            const formatDateLocal = (date: Date) => {
+              const year = date.getFullYear();
+              const month = String(date.getMonth() + 1).padStart(2, "0");
+              const day = String(date.getDate()).padStart(2, "0");
+            
+              return `${year}-${month}-${day}`;
+            };
+            
             const found = data.find((d: any) => {
-              const dDate = new Date(d.date);
-              return dDate.toDateString() === day.toDateString();
+              return d.date === formatDateLocal(day);
             });
           
             return {
